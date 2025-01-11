@@ -1,0 +1,26 @@
+jimmy		mcguill
+Saul		Goodman
+themister	man
+/*
+const { readFile, readFileSync } = require('fs');
+
+readFile('./testText.txt', 'utf8', (err, txt) => {
+    console.log(txt);
+});
+
+//const ipa = readFileSync('./ipadict.txt', 'utf8');
+//console.log(ipa);
+
+
+readFile('./fypBasicApp.html', 'utf8', (err, html) => {
+        if (err) {
+            response.status(500).send('sorry, an error has occured');
+        }
+
+        response.send(html);
+    })
+
+console.log('done (◔◡◔)')
+*/
+
+//====================
