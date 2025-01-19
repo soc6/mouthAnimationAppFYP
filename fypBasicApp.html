@@ -2,20 +2,44 @@
 <html>
     <head>
         <title> Basic mouth animation app</title>
-        <script src="jsFiles/mouthAnimCode.js"></script>
     </head>
+    <style>
+        body {
+          display: flex;
+          justify-content: center;  /* Center horizontally */
+          align-items: center;  /* Center vertically */
+          height: 100vh;  /* Full viewport height */
+          margin: 0;  /* Remove default margin */
+        }
+        .content {
+          text-align: left;  /* Align the text inside the container to the left */
+        }
+      </style>
     <body>
         <center>
         <img id="mouthDisplay" src="mouths/closedMouth.png">
+        <br>
+        <label for="speeds">Mouth Speak Speed:</label>
+        <select id="speeds" name="speeds">
+            <option value="verySlow">very slow</option>
+            <option value="slow">slow</option>
+            <option value="medium" selected="selected">medium</option>
+            <option value="fast">fast</option>
+        </select>
+        <div class="content">
         <p id="wordDisplay">Isn't it nice my friend to see so many elephants</p>
+        </div>
         <br>
         <label for="wordsInput">Enter the words you wish the mouth to say</label><br>
         <textarea id="wordsInput" name="wordsInput" rows="5" cols="33">Isn't it nice my friend to see so many elephants</textarea><br>
-        <button id="micButton" onclick="microphoneListen()"> Record words for the mouth to say </button><br>
-        <button id="generateButton" onclick="processInput()"> Generate mouth animation </button>
+        <button id="micButton"> Record words for the mouth to say </button><br>
+        <button id="generateButton" > Generate mouth animation </button>
+
+        
 
         <p id="phoneticVersion">həˈləʊ</p>
         </center>
         
     </body>
+    <script src="jsFiles/mouthAnimCode.js" type="module"></script>
 </html>

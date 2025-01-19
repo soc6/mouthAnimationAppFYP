@@ -57,7 +57,7 @@ export function generateMouthFrames(ipaText){
         else {
             currentIPAletter = ipaText.charAt(i);
         }
-        console.log(currentIPAletter);
+        //console.log(currentIPAletter);
         switch(currentIPAletter) {
             //if a 'oval mouth' sound
             case 'h':
@@ -156,6 +156,6 @@ export function generateMouthFrames(ipaText){
                 break;
         }           
     }
-    console.log(animaFrameArray);
+    //console.log(animaFrameArray);
     return animaFrameArray;
 }
