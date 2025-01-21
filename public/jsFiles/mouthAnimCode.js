@@ -6,6 +6,10 @@ const synth = window.speechSynthesis;
 const generateButton = document.getElementById('generateButton');
 const micButton = document.getElementById('micButton');
 const mouthSpeedItemList = document.getElementById('speeds');
+const wordsInput = document.getElementById("wordsInput");
+
+let microphoneEnabled = false;
+let wantedVoiceName = 'Microsoft George - English (United Kingdom)';
 
 
 let timeForEachFrame = 55;
@@ -89,46 +93,29 @@ if(generateButton){
 
 //process the words given in the text area
 async function processInput(){
+    synth.cancel();
 
     let voices = window.speechSynthesis.getVoices();
     let theVoice;
+
     for(let m = 0; m < voices.length; m++){
-        
-        
-        //APP CAN RUN THESE VOICES
-        let wantedVoiceName = 'Microsoft George - English (United Kingdom)';
-        //let wantedVoiceName = 'Microsoft Hazel - English (United Kingdom)';
-        //let wantedVoiceName = 'Microsoft Susan - English (United Kingdom)';
-
-        //CAUSE APP TO NOT WORK
-        //let wantedVoiceName = 'Google US English'
-        //let wantedVoiceName = 'Google UK English Female';
-        //let wantedVoiceName = 'Google UK English Male';
-
         if(voices[m].name === wantedVoiceName){
             theVoice = voices[m];
-            //console.log(theVoice);
         }
     }
-    
 
-    synth.cancel();    
-    let input = document.getElementById("wordsInput").value;
-
-    const words = input.split(" ");
-
-    console.log(words)
+    let input = wordsInput.value;
    
     const utterThis = new SpeechSynthesisUtterance(input);
-    utterThis.pitch =0;
+    utterThis.pitch = 0;
     utterThis.rate = speechRate;
 
     if(theVoice != null){
         utterThis.voice = theVoice;
     }
+    console.log(utterThis.voice)
 
-
-    synth.resume();
+    //synth.resume();
     utterThis.addEventListener("boundary", async (event) => {
         utterThis.rate = speechRate;
         if(event.name == 'word'){
@@ -192,24 +179,122 @@ if(micButton){
 const recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition);
 
 recognition.continuous = true;
-recognition.interimResults = true;
-
-let listening = false;
+recognition.interimResults = false;
 
 //updates the text area with words spoken into the microphone
 function microphoneListen(){
-    const micButton = document.getElementById("micButton");
-    if(!listening){
-        micButton.textContent = " Stop recording words for the mouth to say "
+    if(microphoneEnabled){
         recognition.start();
+        if (confirm("🎤 Record words for the mouth to say 🎤")) {
+            recognition.stop();
+                
+        } else {
+            recognition.abort();
+            console.log("You pressed Cancel!")
+        }
     } else {
-        micButton.textContent = " Record words for the mouth to say "
-        recognition.stop();
+        window.alert("You need to allow access to your microphone to record with voice")
     }
-    listening = !listening;
 }
 
 recognition.onresult = event => {
     const transcript = event.results[event.results.length - 1][0].transcript;
     document.getElementById("wordsInput").value = transcript;
 }
+
+//check if the browser has the microphone enabled
+function checkMicrophonePermission() {
+    //Check if the Permissions API is supported
+    if (navigator.permissions) {
+        navigator.permissions.query({ name: 'microphone' })
+        .then(function(permissionStatus) {
+            //Check the permission status
+            if (permissionStatus.state === 'granted') {
+                microphoneEnabled = true;
+            } else if (permissionStatus.state === 'prompt') {
+                microphoneEnabled = false;
+            } else {
+                microphoneEnabled = false;
+            }
+  
+            //update permission status everytime it gets changed
+            permissionStatus.onchange = function() {
+                console.log('Microphone permission state has changed to:', permissionStatus.state);
+                if(permissionStatus.state === 'granted'){
+                    microphoneEnabled = true;
+                } else {
+                    microphoneEnabled = false;
+                }
+            };
+        })
+        .catch(function(error) {
+          console.error('Error checking microphone permission:', error);
+        });
+    } else {
+        console.log('Permissions API is not supported in this browser.');
+        microphoneEnabled = true;
+    }
+}
+  
+//Call the function to check the microphone permission status
+checkMicrophonePermission();
+
+
+//fill the voice select box with all the voices that work with the app
+let voicesPopulated = false;
+    function populateVoiceList() {
+    console.log('POPULATING')
+
+    if(voicesPopulated){
+        return; //exit if the voices have already been populated
+    }
+
+    const voiceSelect = document.getElementById('voiceSelect');
+    const voices = window.speechSynthesis.getVoices();
+
+    //clear the existing options
+    voiceSelect.innerHTML = '<option value="">Select a voice</option>';
+
+    //add each voice as an option in the select list
+    let microSoftvoiceFound = false;
+
+    voices.forEach(function(voice) {
+        let firstWord = voice.name.split(' ')[0]
+
+        if(firstWord === 'Microsoft'){
+            //sets the default voice to be one that works
+            if(microSoftvoiceFound == false){
+                wantedVoiceName = voice.name;
+            }
+
+            const option = document.createElement('option');
+            
+            option.textContent = `${voice.name}`;
+            option.value = voice.name;
+            voiceSelect.appendChild(option);
+
+            microSoftvoiceFound = true;
+        }
+    });
+    voicesPopulated = true;
+    //if no microsoft voices were found, warn the user
+    console.log(wantedVoiceName)
+    if(microSoftvoiceFound == false){
+        alert("Warning: This app needs Microsoft Text-To-Speech voices to work\nIt seems like your browser doesn't support these voices\nPlease trying using a different browser (like firefox or google chrome) to get the most out of this app")
+        console.log('no microsoft found')
+    }
+}
+
+//wait for voices to be loaded
+if (window.speechSynthesis.onvoiceschanged !== undefined) {
+    window.speechSynthesis.onvoiceschanged = populateVoiceList;
+} else {
+    //if voices are already loaded, populate the list
+    populateVoiceList();
+}
+
+//event listener for the select element to store the selected voice
+document.getElementById('voiceSelect').addEventListener('change', function(event) {
+    wantedVoiceName = event.target.value;  // Store the selected voice in the variable
+    console.log(`Selected Voice: ${wantedVoiceName}`);
+});

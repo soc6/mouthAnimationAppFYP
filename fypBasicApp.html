@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html>
+<html lang="en-GB">
     <head>
         <title> Basic mouth animation app</title>
     </head>
@@ -25,15 +25,19 @@
             <option value="slow">slow</option>
             <option value="medium" selected="selected">medium</option>
             <option value="fast">fast</option>
+        </select><br>
+        <label for="voiceSelect">Mouth Voice:</label>
+        <select id="voiceSelect">
+          <option value="">Select a voice</option>
         </select>
+
         <div class="content">
         <p id="wordDisplay">Isn't it nice my friend to see so many elephants</p>
         </div>
         <br>
         <label for="wordsInput">Enter the words you wish the mouth to say</label><br>
         <textarea id="wordsInput" name="wordsInput" rows="5" cols="33">Isn't it nice my friend to see so many elephants</textarea><br>
-        <button id="micButton"> Record words for the mouth to say </button><br>
-        <button id="generateButton" > Generate mouth animation </button>
+        <button id="generateButton" > Generate mouth animation </button> <button id="micButton"> 🎤 </button>
 
         
 

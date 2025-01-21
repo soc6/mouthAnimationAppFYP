@@ -73,6 +73,7 @@ export function generateMouthFrames(ipaText){
             case 'ʊ':
             case 'ɜ':
             case 'r':
+            case 'ɹ':
                 //console.log('e');
                 animaFrameArray.push(mouthEnum.ghostMouth);
                 break;
@@ -92,6 +93,7 @@ export function generateMouthFrames(ipaText){
             case 'oʊ':
             case 'aʊ':
             case 'ɔɪ':
+            case 'ɔ':
                 //console.log('eu'); 
                 animaFrameArray.push(mouthEnum.circleMouth);
                 break;
