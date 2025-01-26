@@ -94,6 +94,7 @@ export function generateMouthFrames(ipaText){
             case 'aʊ':
             case 'ɔɪ':
             case 'ɔ':
+            case 'o':
                 //console.log('eu'); 
                 animaFrameArray.push(mouthEnum.circleMouth);
                 break;
@@ -141,6 +142,7 @@ export function generateMouthFrames(ipaText){
             case 'æ':
             case 'eɪ':
             case 'ɪə':
+            case 'ɑ':
                 animaFrameArray.push(mouthEnum.wideMouth);
                 break;
 
@@ -154,7 +156,7 @@ export function generateMouthFrames(ipaText){
                 break;
 
             default:
-                //console.log('default');
+                console.log('default :'+currentIPAletter);
                 break;
         }           
     }

@@ -1,6 +1,7 @@
 import { generateMouthFrames } from '../jsFiles/generateMouthFrames.js'
 import { updateWordDisplay, updateMouthDisplay } from '../jsFiles/displayCode.js'
 import { getWordFromIndex } from '../jsFiles/helperFunctions.js'
+import { getIPAByRules } from '../jsFiles/getIPAByRules.js';
 
 const synth = window.speechSynthesis;
 const generateButton = document.getElementById('generateButton');
@@ -61,7 +62,7 @@ function updateSpeakSpeed() {
     
     switch(selectedSpeed) {
         case 'verySlow':
-            timeForEachFrame = 110;
+            timeForEachFrame = 180;
             speechRate = 0.1;
             break;
         case 'slow':
@@ -94,6 +95,7 @@ if(generateButton){
 //process the words given in the text area
 async function processInput(){
     synth.cancel();
+    micButton.disabled = true;
 
     let voices = window.speechSynthesis.getVoices();
     let theVoice;
@@ -105,6 +107,9 @@ async function processInput(){
     }
 
     let input = wordsInput.value;
+
+    //let words = input.split(' ');
+    //console.log(words);
    
     const utterThis = new SpeechSynthesisUtterance(input);
     utterThis.pitch = 0;
@@ -117,7 +122,7 @@ async function processInput(){
 
     //synth.resume();
     utterThis.addEventListener("boundary", async (event) => {
-        utterThis.rate = speechRate;
+        //utterThis.rate = speechRate; //doesnt do anything, Maybe pausing then resuming will allow it to work?
         if(event.name == 'word'){
             console.log('new word ');
             let startIndex = event.charIndex;
@@ -135,12 +140,91 @@ async function processInput(){
     });
 
     utterThis.addEventListener("end", (event) => {
-        document.getElementById('wordDisplay').innerHTML = input.replace(/(\r\n|\n)/g, '<br>');;
+        //document.getElementById('wordDisplay').innerHTML = input.replace(/(\r\n|\n)/g, '<br>');
+        updateClickableWordDisplay(input);
+        micButton.disabled = false;
     });
 
     synth.speak(utterThis);
     console.log("is it speaking? "+synth.speaking);
-    
+}
+
+function updateClickableWordDisplay(fullText){
+    const wordDisplay = document.getElementById('wordDisplay');
+
+    //clear the word display
+    wordDisplay.innerHTML = "";
+
+    //break text into seperate lines
+    let lines = fullText.split(/\r?\n/);
+    console.log(lines)
+
+    let newWordDisplay = ""
+    //for each line
+    for(let j = 0; j < lines.length; j++){
+        
+        //break the current line into words
+        let words = lines[j].split(' ');
+
+        //console.log(words)
+
+        //for each word, add it to 'newWordDisplay' with a unique ID span
+        
+        for (let i = 0; i < words.length; i++) {
+            newWordDisplay += `<span id="span${j}-${i}">${words[i]}</span> `;
+        }
+        newWordDisplay += '<br>';
+
+        console.log(newWordDisplay)
+    }
+
+    //add the new text to the html
+    wordDisplay.innerHTML += newWordDisplay;
+
+    //ad event listners to all the spans
+    for (let j = 0; j < lines.length; j++){
+        let wordCount = lines[j].split(' ').length;
+        for (let i = 0; i < wordCount; i++){
+            let curSpan = document.getElementById(`span${j}-${i}`);
+
+            if(curSpan){
+                console.log(`FOUND span${j}-${i}`)
+            }
+
+            curSpan.addEventListener('click', (event) => {
+                console.log(event.target.textContent);
+                speakSingleWord(event.target.textContent);
+            })
+        }
+    }
+}
+
+function speakSingleWord(word) {
+    synth.cancel();
+
+    const wordUtter = new SpeechSynthesisUtterance(word);
+    wordUtter.pitch = 0;
+    wordUtter.rate = speechRate;
+
+    let voices = window.speechSynthesis.getVoices();
+    let theVoice;
+
+    for(let m = 0; m < voices.length; m++){
+        if(voices[m].name === wantedVoiceName){
+            theVoice = voices[m];
+        }
+    }
+
+    if(theVoice != null){
+        wordUtter.voice = theVoice;
+    }
+
+    wordUtter.addEventListener("boundary", async (event) => {
+        if(event.name == 'word'){
+            await lipSyncWord(word);
+        }
+    });
+    synth.speak(wordUtter);
 }
 
 //update the mouth display to lip sync the 'input' word
@@ -156,18 +240,25 @@ async function lipSyncWord(input){
 
     let sentence;
 
+    //if the input was not found in the IPA dictionary
+    let byRules = "";
     if(output == undefined){
-        sentence = "No IPA spelling for the current input";
-        document.getElementById('phoneticVersion').innerText = sentence;
-    }
-    else {
-        sentence = "The entered input '"+input+"' has the IPA spelling '"+ output+"'";
-        document.getElementById('phoneticVersion').innerText = sentence;
-        let animFrames = generateMouthFrames(output);
+        output = getIPAByRules(input);
+        console.log(output)
+        byRules += ", found using rules"
+        //sentence = "No IPA spelling for the current input, by rules it's "+output;
+        //document.getElementById('phoneticVersion').innerText = sentence;
 
-        await updateMouthDisplay(animFrames, timeForEachFrame);
-        
     }
+    //else { //get rid of this else once 'getIPAByRules' is functional
+
+    sentence = "The entered input '"+input+"' has the IPA spelling '"+ output+"'"+byRules;
+    document.getElementById('phoneticVersion').innerText = sentence;
+    let animFrames = generateMouthFrames(output);
+
+    await updateMouthDisplay(animFrames, timeForEachFrame);
+        
+    //}
 }
 
 if(micButton){
@@ -280,7 +371,7 @@ let voicesPopulated = false;
     //if no microsoft voices were found, warn the user
     console.log(wantedVoiceName)
     if(microSoftvoiceFound == false){
-        alert("Warning: This app needs Microsoft Text-To-Speech voices to work\nIt seems like your browser doesn't support these voices\nPlease trying using a different browser (like firefox or google chrome) to get the most out of this app")
+        alert("Warning: This app needs Microsoft Text-To-Speech voices to work\nIt seems like your browser doesn't support these voices\nPlease trying using a different browser (like microsoft edge or google chrome) to get the most out of this app")
         console.log('no microsoft found')
     }
 }
@@ -298,3 +389,19 @@ document.getElementById('voiceSelect').addEventListener('change', function(event
     wantedVoiceName = event.target.value;  // Store the selected voice in the variable
     console.log(`Selected Voice: ${wantedVoiceName}`);
 });
+
+//event listener for the x button that stops the mouth speaking
+document.getElementById('xButton').addEventListener('click', function(event) {
+    if(synth.speaking){
+        synth.cancel();
+        //document.getElementById('wordDisplay').innerHTML = wordsInput.value.replace(/(\r\n|\n)/g, '<br>');
+        updateClickableWordDisplay(wordsInput.value);
+        micButton.disabled = false;
+    }
+});
+
+const span = document.getElementById('test');
+
+span.addEventListener('click', (event) => {
+    console.log(event.target.textContent);
+})
