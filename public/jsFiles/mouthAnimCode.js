@@ -1,11 +1,12 @@
-import { generateMouthFrames } from '../jsFiles/generateMouthFrames.js'
-import { updateWordDisplay, updateMouthDisplay } from '../jsFiles/displayCode.js'
-import { getWordFromIndex } from '../jsFiles/helperFunctions.js'
+import { generateMouthFrames } from '../jsFiles/generateMouthFrames.js';
+import { updateWordDisplay, updateMouthDisplay } from '../jsFiles/displayCode.js';
+import { getWordFromIndex } from '../jsFiles/helperFunctions.js';
 import { getIPAByRules } from '../jsFiles/getIPAByRules.js';
 
 const synth = window.speechSynthesis;
 const generateButton = document.getElementById('generateButton');
 const micButton = document.getElementById('micButton');
+const downloadVideoButton = document.getElementById("downloadVideoButton");
 const mouthSpeedItemList = document.getElementById('speeds');
 const wordsInput = document.getElementById("wordsInput");
 
@@ -15,6 +16,37 @@ let wantedVoiceName = 'Microsoft George - English (United Kingdom)';
 
 let timeForEachFrame = 55;
 let speechRate = 1;
+
+
+//TRYING OUT SOME CANVAS PLSS WORRRRK BABY
+const mouthCanvas = document.getElementById("mouthCanvas");
+const ctx = mouthCanvas.getContext("2d");
+const startImg = new Image();
+startImg.src = "mouths/closedMouth.png";
+startImg.onload = function() {
+    // Draw a white rectangle to cover the background
+    ctx.fillStyle = 'white';
+    ctx.fillRect(0, 0, mouthCanvas.width, mouthCanvas.height);
+    //ctx.clearRect(0,0,mouthCanvas.width,mouthCanvas.height);
+    ctx.drawImage(startImg, 0, 0, mouthCanvas.width, mouthCanvas.height);
+}
+
+
+//da media
+const stream = mouthCanvas.captureStream();
+const recorder = new MediaRecorder(stream);
+let chunks = [];
+
+recorder.ondataavailable = event => chunks.push(event.data);
+
+
+downloadVideoButton.addEventListener("click", () => {
+    const blob = new Blob(chunks, { type: "video/webm" });
+    const a = document.createElement("a");
+    a.href = URL.createObjectURL(blob);
+    a.download = "animation.webm";
+    a.click();
+})
 
 //this will be overwritten by the IPA dictionary stored in a file
 let IPAConvertionDictionary = {
@@ -94,6 +126,7 @@ if(generateButton){
 
 //process the words given in the text area
 async function processInput(){
+    recorder.stop();
     synth.cancel();
     micButton.disabled = true;
 
@@ -107,10 +140,8 @@ async function processInput(){
     }
 
     let input = wordsInput.value;
-
-    //let words = input.split(' ');
-    //console.log(words);
    
+
     const utterThis = new SpeechSynthesisUtterance(input);
     utterThis.pitch = 0;
     utterThis.rate = speechRate;
@@ -127,7 +158,7 @@ async function processInput(){
             console.log('new word ');
             let startIndex = event.charIndex;
 
-            console.log(input[startIndex]);
+            //console.log(input[startIndex]);
 
             let result = getWordFromIndex(input,startIndex);
             let curWord = result.word;
@@ -135,6 +166,7 @@ async function processInput(){
 
             updateWordDisplay(input,startIndex,result.end);
 
+            //we also want to update Gif
             await lipSyncWord(curWord);
         }
     });
@@ -143,7 +175,14 @@ async function processInput(){
         //document.getElementById('wordDisplay').innerHTML = input.replace(/(\r\n|\n)/g, '<br>');
         updateClickableWordDisplay(input);
         micButton.disabled = false;
+        downloadVideoButton.disabled = false;
+        recorder.stop();
     });
+
+    //this is a test
+    chunks = [];
+    downloadVideoButton.disabled = true;
+    recorder.start();
 
     synth.speak(utterThis);
     console.log("is it speaking? "+synth.speaking);
@@ -157,7 +196,7 @@ function updateClickableWordDisplay(fullText){
 
     //break text into seperate lines
     let lines = fullText.split(/\r?\n/);
-    console.log(lines)
+    //console.log(lines)
 
     let newWordDisplay = ""
     //for each line
@@ -175,7 +214,7 @@ function updateClickableWordDisplay(fullText){
         }
         newWordDisplay += '<br>';
 
-        console.log(newWordDisplay)
+        //console.log(newWordDisplay)
     }
 
     //add the new text to the html
@@ -186,10 +225,6 @@ function updateClickableWordDisplay(fullText){
         let wordCount = lines[j].split(' ').length;
         for (let i = 0; i < wordCount; i++){
             let curSpan = document.getElementById(`span${j}-${i}`);
-
-            if(curSpan){
-                console.log(`FOUND span${j}-${i}`)
-            }
 
             curSpan.addEventListener('click', (event) => {
                 console.log(event.target.textContent);
@@ -244,21 +279,17 @@ async function lipSyncWord(input){
     let byRules = "";
     if(output == undefined){
         output = getIPAByRules(input);
-        console.log(output)
+        //console.log(output)
         byRules += ", found using rules"
-        //sentence = "No IPA spelling for the current input, by rules it's "+output;
-        //document.getElementById('phoneticVersion').innerText = sentence;
-
     }
-    //else { //get rid of this else once 'getIPAByRules' is functional
 
     sentence = "The entered input '"+input+"' has the IPA spelling '"+ output+"'"+byRules;
     document.getElementById('phoneticVersion').innerText = sentence;
     let animFrames = generateMouthFrames(output);
 
     await updateMouthDisplay(animFrames, timeForEachFrame);
-        
-    //}
+
+ 
 }
 
 if(micButton){
@@ -333,7 +364,7 @@ checkMicrophonePermission();
 
 //fill the voice select box with all the voices that work with the app
 let voicesPopulated = false;
-    function populateVoiceList() {
+function populateVoiceList() {
     console.log('POPULATING')
 
     if(voicesPopulated){
@@ -394,14 +425,9 @@ document.getElementById('voiceSelect').addEventListener('change', function(event
 document.getElementById('xButton').addEventListener('click', function(event) {
     if(synth.speaking){
         synth.cancel();
+        recorder.stop();
         //document.getElementById('wordDisplay').innerHTML = wordsInput.value.replace(/(\r\n|\n)/g, '<br>');
         updateClickableWordDisplay(wordsInput.value);
         micButton.disabled = false;
     }
 });
-
-const span = document.getElementById('test');
-
-span.addEventListener('click', (event) => {
-    console.log(event.target.textContent);
-})

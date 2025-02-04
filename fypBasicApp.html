@@ -17,7 +17,8 @@
       </style>
     <body>
         <center>
-        <img id="mouthDisplay" src="mouths/closedMouth.png">
+        <!--<img id="mouthDisplay" src="mouths/closedMouth.png">-->
+        <canvas id="mouthCanvas" width="255" height="255"></canvas>
         <br>
         <label for="speeds">Mouth Speak Speed:</label>
         <select id="speeds" name="speeds">
@@ -39,9 +40,10 @@
         <textarea id="wordsInput" name="wordsInput" rows="5" cols="33">Isn't it nice my friend to see so many elephants</textarea><br>
         <button id="generateButton" > Generate mouth animation </button> <button id="xButton"> ❌ </button> <button id="micButton"> 🎤 </button> 
 
-        
+   
 
-        <p id="phoneticVersion">həˈləʊ</p>
+        <p id="phoneticVersion">həˈləʊ</p><br>
+        <button id="downloadVideoButton" disabled="true"> Download animation as mp4 </button><br>
         </center>
         
     </body>
