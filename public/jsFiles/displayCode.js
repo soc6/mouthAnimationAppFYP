@@ -40,7 +40,7 @@ export function updateWordDisplay(text, start, end){
 }
 
 //using frames as an input, updates the mouth display with the appropriate mouth shape images
-export async function updateMouthDisplay(inputFrames, frameTime){
+export async function updateMouthDisplay(inputFrames, frameTime, backgroundColour){
     for (let i = 0; i < inputFrames.length; i++){
         //document.getElementById('mouthDisplay').src = "../mouths/"+mouths[inputFrames[i]];
 
@@ -48,7 +48,7 @@ export async function updateMouthDisplay(inputFrames, frameTime){
         img.src = "../mouths/"+mouths[inputFrames[i]];
         img.onload = function() {
             // Draw a white rectangle to cover the background
-            ctx.fillStyle = 'white';
+            ctx.fillStyle = backgroundColour;
             ctx.fillRect(0, 0, mouthCanvas.width, mouthCanvas.height);
 
             //ctx.clearRect(0,0,mouthCanvas.width,mouthCanvas.height);
@@ -63,7 +63,7 @@ export async function updateMouthDisplay(inputFrames, frameTime){
     img.src = "mouths/closedMouth.png";
     img.onload = function() {
         // Draw a white rectangle to cover the background
-        ctx.fillStyle = 'white';
+        ctx.fillStyle = backgroundColour;
         ctx.fillRect(0, 0, mouthCanvas.width, mouthCanvas.height);
 
         //ctx.clearRect(0,0,mouthCanvas.width,mouthCanvas.height);

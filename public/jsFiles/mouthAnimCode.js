@@ -8,6 +8,7 @@ const generateButton = document.getElementById('generateButton');
 const micButton = document.getElementById('micButton');
 const downloadVideoButton = document.getElementById("downloadVideoButton");
 const mouthSpeedItemList = document.getElementById('speeds');
+const backgroundColourList = document.getElementById('colours');
 const wordsInput = document.getElementById("wordsInput");
 
 let microphoneEnabled = false;
@@ -16,6 +17,7 @@ let wantedVoiceName = 'Microsoft George - English (United Kingdom)';
 
 let timeForEachFrame = 55;
 let speechRate = 1;
+let backgroundColour = 'white';
 
 
 //TRYING OUT SOME CANVAS PLSS WORRRRK BABY
@@ -25,7 +27,7 @@ const startImg = new Image();
 startImg.src = "mouths/closedMouth.png";
 startImg.onload = function() {
     // Draw a white rectangle to cover the background
-    ctx.fillStyle = 'white';
+    ctx.fillStyle = backgroundColour;
     ctx.fillRect(0, 0, mouthCanvas.width, mouthCanvas.height);
     //ctx.clearRect(0,0,mouthCanvas.width,mouthCanvas.height);
     ctx.drawImage(startImg, 0, 0, mouthCanvas.width, mouthCanvas.height);
@@ -81,6 +83,17 @@ function fetchDict() {
 
 // Fetch data as soon as the page loads
 window.onload = fetchDict;
+
+if(backgroundColourList){
+    backgroundColourList.addEventListener('change', (event) => {
+        backgroundColour = event.target.value;
+        ctx.fillStyle = backgroundColour;
+        ctx.fillRect(0, 0, mouthCanvas.width, mouthCanvas.height);
+        ctx.drawImage(startImg, 0, 0, mouthCanvas.width, mouthCanvas.height);
+    })
+} else {
+    console.log("backgroundColourList doesn't exist");
+}
 
 if(mouthSpeedItemList){
     mouthSpeedItemList.addEventListener('change', updateSpeakSpeed);
@@ -287,7 +300,7 @@ async function lipSyncWord(input){
     document.getElementById('phoneticVersion').innerText = sentence;
     let animFrames = generateMouthFrames(output);
 
-    await updateMouthDisplay(animFrames, timeForEachFrame);
+    await updateMouthDisplay(animFrames, timeForEachFrame, backgroundColour);
 
  
 }
