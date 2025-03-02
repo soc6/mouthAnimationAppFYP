@@ -11,6 +11,7 @@ const mouthSpeedItemList = document.getElementById('speeds');
 const backgroundColourList = document.getElementById('colours');
 const mouthSizeInput = document.getElementById('mouthSize');
 const wordsInput = document.getElementById("wordsInput");
+const wordDisplay = document.getElementById('wordDisplay');
 
 let microphoneEnabled = false;
 let wantedVoiceName = 'Microsoft George - English (United Kingdom)';
@@ -29,11 +30,6 @@ startImg.src = "mouths/closedMouth.png";
 
 startImg.onload = function() {
     setUpCanvas();
-    // Draw a white rectangle to cover the background
-    //ctx.fillStyle = backgroundColour;
-    //ctx.fillRect(0, 0, mouthCanvas.width, mouthCanvas.height);
-    //ctx.clearRect(0,0,mouthCanvas.width,mouthCanvas.height);
-    //ctx.drawImage(startImg, 0, 0, mouthCanvas.width, mouthCanvas.height);
 }
 
 function setUpCanvas(){
@@ -57,7 +53,16 @@ downloadVideoButton.addEventListener("click", () => {
     const blob = new Blob(chunks, { type: "video/webm" });
     const a = document.createElement("a");
     a.href = URL.createObjectURL(blob);
-    a.download = "animation.webm";
+    
+    let textArea = wordsInput.value;
+    let videoTitle;
+    if(textArea.length < 15 ){
+        videoTitle = textArea;
+    } else {
+        videoTitle = textArea.substring(0,15)+"...";
+    }
+
+    a.download = videoTitle+".webm";
     a.click();
 })
 
@@ -231,8 +236,6 @@ async function processInput(){
 }
 
 function updateClickableWordDisplay(fullText){
-    const wordDisplay = document.getElementById('wordDisplay');
-
     //clear the word display
     wordDisplay.innerHTML = "";
 
@@ -327,7 +330,9 @@ async function lipSyncWord(input){
 
     sentence = "The entered input '"+input+"' has the IPA spelling '"+ output+"'"+byRules;
     document.getElementById('phoneticVersion').innerText = sentence;
-    let animFrames = generateMouthFrames(output);
+    
+    let mouthFramesReturn = generateMouthFrames(output);
+    let animFrames = mouthFramesReturn.frames;
 
     await updateMouthDisplay(animFrames, timeForEachFrame, backgroundColour);
 
@@ -463,8 +468,7 @@ document.getElementById('voiceSelect').addEventListener('change', function(event
     console.log(`Selected Voice: ${wantedVoiceName}`);
 });
 
-//event listener for the x button that stops the mouth speaking
-document.getElementById('xButton').addEventListener('click', function(event) {
+function stopSpeaking() {
     if(synth.speaking){
         synth.cancel();
         recorder.stop();
@@ -472,4 +476,260 @@ document.getElementById('xButton').addEventListener('click', function(event) {
         updateClickableWordDisplay(wordsInput.value);
         micButton.disabled = false;
     }
+}
+
+//event listener for the x button that stops the mouth speaking
+document.getElementById('xButton').addEventListener('click', function(event) {
+    stopSpeaking();
 });
+
+////////////////////////////
+const lipPage = document.getElementById("lipSyncPage");
+const homePage = document.getElementById("homePage");
+const mouthFramePage = document.getElementById("mouthFramePage");
+
+function goToHomePage() {
+    stopSpeaking();
+    homePage.style.display = "block";
+    homePage.ariaCurrent = "page";
+    homePage.className = "nav-link active";
+
+
+    lipPage.style.display = "none";
+    lipPage.ariaCurrent = "false";
+    lipPage.className = "nav-link";
+
+    mouthFramePage.style.display = "none";
+    mouthFramePage.ariaCurrent = "false";
+    mouthFramePage.className = "nav-link";
+}
+
+function goToLipSyncPage() {
+    lipPage.style.display = "block";
+    lipPage.ariaCurrent = "page";
+    lipPage.className = "nav-link active";
+
+
+    homePage.style.display = "none";
+    homePage.ariaCurrent = "false";
+    homePage.className = "nav-link";
+
+    mouthFramePage.style.display = "none";
+    mouthFramePage.ariaCurrent = "false";
+    mouthFramePage.className = "nav-link";
+}
+
+function goToMouthFramePage() {
+    stopSpeaking();
+    mouthFramePage.style.display = "block";
+    mouthFramePage.ariaCurrent = "page";
+    mouthFramePage.className = "nav-link active";
+
+
+    homePage.style.display = "none";
+    homePage.ariaCurrent = "false";
+    homePage.className = "nav-link";
+
+    lipPage.style.display = "none";
+    lipPage.ariaCurrent = "false";
+    lipPage.className = "nav-link";
+}
+
+const homePageButton = document.getElementById("homePageButton");
+const lipSyncPageLink = document.getElementById("lipSyncPageButton");
+const mouthFramePageButton = document.getElementById("mouthFramePageButton");
+
+homePageButton.addEventListener('click', () => {
+    goToHomePage();
+});
+lipSyncPageLink.addEventListener('click', () => {
+    goToLipSyncPage();
+});
+mouthFramePageButton.addEventListener('click', () => {
+    goToMouthFramePage();
+});
+
+const mouthFrameInput = document.getElementById("mouthFrameInput");
+const mouthFrameHeading = document.getElementById("mouthFrameHeading");
+const genFramesButton = document.getElementById("genFramesButton");
+
+const mouths = [
+    'closedMouth.png', //0     
+    'ovalMouth.png', //1
+    'ghostMouth.png', //2
+    'tongeTopTeethMouth.png', //3
+    'circleMouth.png', //4
+    'biteLipMouth.png', //5
+    'hmmMouth.png', //6
+    'topTeethMouth.png', //7
+    'teethDownMouth.png', //8
+    'teethUpMouth.png', //9
+    'wideMouth.png', //10
+    'blobMouth.png', //11
+]
+
+function createFrameCarousel(){
+    var input = mouthFrameInput.value;
+    console.log(input)
+
+    //process the word so it can be used as a key for the dictionary
+    input = input.toLowerCase();
+    input = input.trim();
+    input = input.replace(/[.,\/#!$?%\^\*;":{}=\_`~()]/g,"");
+    input = input.replace(/[\r\n]+/g, ''); 
+    //console.log('The inputted word is "'+input+'"');
+
+    let output = IPAConvertionDictionary[input];
+
+    //if the input was not found in the IPA dictionary
+    if(output == undefined){
+        output = getIPAByRules(input);
+    }
+    console.log(output)
+    mouthFrameHeading.innerText = "'"+input+"'"+" has the IPA spelling '"+output+"'";
+
+    //Make a carousel using the IPA frames
+    let mouthFramesReturn = generateMouthFrames(output);
+    let carouselFrames = mouthFramesReturn.frames;
+    let ipaLetterCaptions = mouthFramesReturn.ipaLetters;
+
+    console.log(carouselFrames)
+
+    for(let c=0; c < carouselFrames.length; c++){
+        console.log(mouths[carouselFrames[c]]);
+    }
+
+    //make main carousel div
+    const carousel = document.createElement("div");
+    carousel.id = "mouthCarousel";
+    carousel.className = "carousel carousel-dark carousel-fade";
+    carousel.setAttribute("data-bs-wrap","false");
+
+    //make a div to hold the indicator buttons
+    const indicators = document.createElement("div");
+    indicators.className = "carousel-indicators";
+
+    //make inner carousel div to hold mouth frames
+    const inner = document.createElement("div");
+    inner.className = "carousel-inner";
+
+    //make first frame showing entered word and closed mouth
+    const firstFrame = document.createElement("div");
+    firstFrame.className = "carousel-item active";
+    const firstImg = document.createElement("img");
+    firstImg.src = "../mouths/"+mouths[0];
+    firstImg.className = "d-block w-100";
+    firstImg.alt = "Slide "+(0);
+    const firstCaption = document.createElement("div");
+    firstCaption.className = "carousel-caption";
+    firstCaption.innerHTML = "<h3> "+input+" </h3>";
+    firstFrame.append(firstImg);
+    firstFrame.innerHTML += '<br>'
+    firstFrame.append(firstCaption);
+    inner.append(firstFrame);
+
+    //add first indicator for first frame
+    const firstIndicator = document.createElement("button");
+    firstIndicator.className = "active";
+    firstIndicator.setAttribute("data-bs-target", "#mouthCarousel");
+    firstIndicator.setAttribute("data-bs-slide-to", 0);
+    indicators.append(firstIndicator)
+
+    carouselFrames.forEach((frameNum, index) => {
+        //create a frame image
+        const frameImage = document.createElement("div");
+        frameImage.className = "carousel-item";
+        
+
+        //create image to be shown for frame
+        const img = document.createElement("img");
+        img.src = "../mouths/"+mouths[frameNum];
+        img.className = "d-block w-100";
+        img.alt = "Slide "+(index+1);
+
+        //create IPA letter caption
+        const caption = document.createElement("div");
+        caption.className = "carousel-caption";
+        caption.innerHTML = "<h3> "+ipaLetterCaptions[index]+" </h3>"
+
+        //add all components to frame image
+        frameImage.append(img);
+        frameImage.innerHTML += '<br>'
+        frameImage.append(caption);
+        
+        //add it to the inner carousel
+        inner.append(frameImage);
+
+        //create an indicator button
+        const indicator = document.createElement("button");
+        indicator.setAttribute("data-bs-target", "#mouthCarousel");
+        indicator.setAttribute("data-bs-slide-to", index+1);
+
+        indicators.append(indicator)
+    });
+
+    //make final frame showing closed mouth
+    const finalFrame = document.createElement("div");
+    finalFrame.className = "carousel-item";
+    const finalImg = document.createElement("img");
+    finalImg.src = "../mouths/"+mouths[0];
+    finalImg.className = "d-block w-100";
+    finalImg.alt = "Slide "+carouselFrames.length+1;
+    const finalCaption = document.createElement("div");
+    finalCaption.className = "carousel-caption";
+    finalCaption.innerHTML = "<h3> "+"..."+" </h3>";
+    finalFrame.append(finalImg);
+    finalFrame.innerHTML += '<br>'
+    finalFrame.append(finalCaption);
+    inner.append(finalFrame);
+
+    //add final indicator for final frame
+    const finalIndicator = document.createElement("button");
+    finalIndicator.setAttribute("data-bs-target", "#mouthCarousel");
+    finalIndicator.setAttribute("data-bs-slide-to", carouselFrames.length+1);
+    indicators.append(finalIndicator)
+
+    //create the previous and next buttons
+    const prevButton = `
+    <button class="carousel-control-prev" type="button" data-bs-target="#mouthCarousel" data-bs-slide="prev">
+        <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+        <span class="visually-hidden">Previous</span>
+    </button>`;
+
+    const nextButton = `
+    <button class="carousel-control-next" type="button" data-bs-target="#mouthCarousel" data-bs-slide="next">
+        <span class="carousel-control-next-icon" aria-hidden="true"></span>
+        <span class="visually-hidden">Next</span>
+    </button>`;
+
+    carousel.appendChild(inner);
+    carousel.appendChild(indicators);
+    carousel.innerHTML += prevButton + nextButton;
+
+    document.getElementById("mouthCarouselContainer").replaceChildren(carousel);
+
+    // Initialize the Bootstrap Carousel using JavaScript
+    new bootstrap.Carousel(carousel);
+}
+
+genFramesButton.addEventListener('click', () => {
+    createFrameCarousel();
+});
+
+
+
+function adjustFontSize() {
+    console.log('WOOOWWWW')
+    let words = wordDisplay.innerText.split(" ").length;
+
+    // Base font size: reduce as word count increases
+    let fontSize = Math.max(40 - (words/2), 12); // Prevent going too small
+
+    wordDisplay.style.fontSize = fontSize + "px";
+}
+
+// Adjust when content changes
+//wordDisplay.addEventListener("input", adjustFontSize);
+
+// Run on page load
+adjustFontSize();

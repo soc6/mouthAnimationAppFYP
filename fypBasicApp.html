@@ -2,6 +2,8 @@
 <html lang="en-GB">
     <head>
         <title> Basic mouth animation app</title>
+        <link rel="icon" type="image/x-icon" href="icons/logo.png">
+
         <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
     </head>
@@ -15,7 +17,7 @@
         }
         .content {
           text-align: left;  /* Align the text inside the container to the left */
-          font-size: 40px;
+          font-size: 2.8vw;
         }
 
         /* Change the colour of the slider thumb in settings */
@@ -28,64 +30,98 @@
           border: none;
         }
 
+        /* Move buttons further apart */
+        .carousel-control-prev {
+            left: -50px; /* Move left button away */
+        }
+        .carousel-control-next {
+            right: -50px; /* Move right button away */
+        }
+
+        .carousel-item img {
+            max-width: 100%;
+            height: 300px;
+            object-fit: contain;
+            transition: none;
+        }
+
+        .wordDisplay {
+          max-width: 800px;     /* Allows the paragraph to grow with its container */
+          max-height: 150px;   /* Set a maximum height for scrolling */
+          overflow: auto;      /* Enables scroll if the content exceeds max height */
+          word-wrap: break-word; /* Breaks long words to fit */
+          padding: 10px;       /* Optional padding */
+          border: 1px solid #ccc; /* Optional border for visibility */
+          font-size: 20px;   /* Font size */
+        }
+
       </style>
     <body>
+      <!-- Nav Bar -->
+      <nav class="navbar fixed-top navbar-expand-lg bg-body-tertiary">
+        <div class="container-fluid">
+          <a class="navbar-brand">
+            <img src="icons/logo.png" alt="Mouth Logo" width="60">
+          </a>
+          
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+          </button>
+          <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav">
+              <li class="nav-item">
+                <button class="nav-link active" id="homePageButton" aria-current="page">Home</button>
+              </li>
+              <li class="nav-item">
+                <button class="nav-link" id="lipSyncPageButton" ariaCurrent="false">Lip-Sync</button>
+              </li>
+              <li class="nav-item">
+                <button class="nav-link" id="mouthFramePageButton" ariaCurrent="false">Mouth-Frames</button>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </nav>
+      <!-- End of Nav Bar-->
+      
+      
+      <!-- Home Page -->
+      <div id="homePage" style="display: block;">
+        <h1>Welcome!</h1><br>
+        <h3>Click Lip-Sync to get to the lip sync app</h3><br>
+        <h3>Click Mouth-Frames to get to the mouth frames app</h3><br>
+      </div>
+      <!-- End of Home Page-->
+      
+      <!-- Lip Sync Page -->
+      <div id="lipSyncPage" style="display: none;">
         <center>
-        <!--<img id="mouthDisplay" src="mouths/closedMouth.png">-->
-        <!--<canvas id="mouthCanvas" width="255" height="255"></canvas>-->
         <canvas id="mouthCanvas" width="400" height="400"></canvas>
-        <br>
-
-        <!--
-        <label for="colours">Mouth background colour:</label>
-        <select id="colours" name="colours">
-            <option value="white" selected="selected">white</option>
-            <option value="#150DF7">blue</option>
-            <option value="#04F404">green</option>
-        </select><br>
-        -->
-
-        <!--
-        <label for="speeds">Mouth Speak Speed:</label>
-        <select id="speeds" name="speeds">
-            <option value="verySlow">very slow</option>
-            <option value="slow">slow</option>
-            <option value="medium" selected="selected">medium</option>
-            <option value="fast">fast</option>
-        </select><br>
-        -->
-
-        <!--
-        <label for="voiceSelect">Mouth Voice:</label>
-        <select id="voiceSelect">
-          <option value="">Select a voice</option>
-        </select>
-        -->
-
         <div class="content">
-        <p id="wordDisplay">Isn't it nice my friend to see so many elephants</p>
+        <p id="wordDisplay" class="wordDisplay" style="font-size: 10px;">Isn't it nice my friend to see so many elephants</p>
         </div>
         <br>
-        <label for="wordsInput" style="font-size: 20px;">Enter the words you wish the mouth to say</label><br>
-        <textarea id="wordsInput" name="wordsInput" rows="10" cols="80">Isn't it nice my friend to see so many elephants</textarea><br>
+        <label for="wordsInput" style="font-size: 125%;">Enter the words you wish the mouth to say</label><br>
+        <textarea id="wordsInput" name="wordsInput" rows="10" class="form-control w-75">Isn't it nice my friend to see so many elephants</textarea><br>
         <button id="generateButton" class="btn btn-outline-secondary"> Generate mouth animation </button>
         <br>
 
         <button id="xButton" class="btn btn-outline-secondary" title="Stop the mouth speaking"> 
           <img src="icons/slash-circle.svg">
         </button>
-        <button id="micButton" class="btn btn-outline-secondary">
+        <button id="micButton" class="btn btn-outline-secondary" title="Record text to fill the input">
           <img src="icons/mic-fill.svg">
         </button>
-        <button id="downloadVideoButton" disabled="true" class="btn btn-outline-secondary">
+        <button id="downloadVideoButton" disabled="true" class="btn btn-outline-secondary" title="Download the mouth animation">
           <img src="icons/download.svg">
         </button>
-        <button data-bs-toggle="offcanvas" href="#offcanvasExample" role="button" aria-controls="offcanvasExample" class="btn btn-outline-secondary">
+        <button data-bs-toggle="offcanvas" href="#offcanvasExample" role="button" aria-controls="offcanvasExample" class="btn btn-outline-secondary" title="Open settings">
           <img src="icons/gear.svg">
         </button>
         
 
         <p id="phoneticVersion">həˈləʊ</p><br>
+      
         
         <div class="offcanvas offcanvas-start" tabindex="-1" id="offcanvasExample" aria-labelledby="offcanvasExampleLabel">
           <div class="offcanvas-header">
@@ -127,8 +163,112 @@
             <input type="range" id="mouthSize" min="100" max="1000" value="400" class="form-range">
           </div>
         </div>
-        <!-------->
         </center>
+      </div>
+      <!-- End of lip sync page-->
+
+      <!-- Mouth Frame Page -->
+      <div id="mouthFramePage" style="display: none;">
+        <center><h2 id="mouthFrameHeading"> 'hello' has the IPA spelling 'hʌlow' </h2></center>
+
+        <div id="mouthCarouselContainer">
+        <div id="mouthCarousel" class="carousel carousel-dark carousel-fade" data-bs-wrap="false">
+          <div class="carousel-inner">
+            <!-- the mouth frames -->
+            <div class="carousel-item active">
+              <img src="mouths/closedMouth.png" class="d-block w-100" alt="...">
+              <br>
+              <div class="carousel-caption"><h3> hello </h3></div>
+            </div>
+            <div class="carousel-item">
+              <img src="mouths/ovalMouth.png" class="d-block w-100" alt="...">
+              <br>
+              <div class="carousel-caption"><h3> h </h3></div>
+            </div>
+            <div class="carousel-item">
+              <img src="mouths/blobMouth.png" class="d-block w-100" alt="...">
+              <br>
+              <div class="carousel-caption"><h3> ʌ </h3></div>
+            </div>
+            <div class="carousel-item">
+              <img src="mouths/tongeTopTeethMouth.png" class="d-block w-100" alt="...">
+              <br>
+              <div class="carousel-caption"><h3> l </h3></div>
+            </div>
+            <div class="carousel-item">
+              <img src="mouths/circleMouth.png" class="d-block w-100" alt="...">
+              <br>
+              <div class="carousel-caption"><h3> o </h3></div>
+            </div>
+            <div class="carousel-item">
+              <img src="mouths/circleMouth.png" class="d-block w-100" alt="...">
+              <br>
+              <div class="carousel-caption"><h3> w </h3></div>
+            </div>
+            <div class="carousel-item">
+              <img src="mouths/closedMouth.png" class="d-block w-100" alt="...">
+              <br>
+              <div class="carousel-caption"><h3> ... </h3></div>
+            </div>
+
+            <!-- buttons to get to mouth frames-->
+            <div class="carousel-indicators">
+              <button type="button" class="active"
+                data-bs-target="#mouthCarousel"
+                data-bs-slide-to=0>
+              </button>
+              <button type="button"
+                data-bs-target="#mouthCarousel"
+                data-bs-slide-to=1>
+              </button>
+              <button type="button"
+                data-bs-target="#mouthCarousel"
+                data-bs-slide-to=2>
+              </button>
+              <button type="button"
+                data-bs-target="#mouthCarousel"
+                data-bs-slide-to=3>
+              </button>
+              <button type="button"
+                data-bs-target="#mouthCarousel"
+                data-bs-slide-to=4>
+              </button>
+              <button type="button"
+                data-bs-target="#mouthCarousel"
+                data-bs-slide-to=5>
+              </button>
+              <button type="button"
+                data-bs-target="#mouthCarousel"
+                data-bs-slide-to=6>
+              </button>
+            </div>
+          </div>
+
+          <!-- prev and next buttons -->
+          <button class="carousel-control-prev" type="button" data-bs-target="#mouthCarousel" data-bs-slide="prev">
+            <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+            <span class="visually-hidden">Previous</span>
+          </button>
+
+          <button class="carousel-control-next" type="button" data-bs-target="#mouthCarousel" data-bs-slide="next">
+            <span class="carousel-control-next-icon" aria-hidden="true"></span>
+            <span class="visually-hidden">Next</span>
+          </button>
+
+          
+        </div>
+        </div>
+
+        <br>
+
+        <center>
+        <input id="mouthFrameInput"value="hello"><br><br>
+        <button id="genFramesButton" class="btn btn-outline-secondary" title="Stop the mouth speaking"> 
+          Generate Frames
+        </button>
+      </center>
+      </div>
+      <!-- End of Mouth Frame Page-->
         
     </body>
     <script src="jsFiles/mouthAnimCode.js" type="module"></script>

@@ -16,6 +16,7 @@ const mouthEnum = {
 //converts the IPA letters into numbers that represent the mouth shape that is needed to make the sound
 export function generateMouthFrames(ipaText){
     var animaFrameArray = [];
+    var correspondingIPALetters = [];
 
     // could make an Enum for the mouth shapes
     for (let i = 0; i < ipaText.length; i++) {
@@ -66,6 +67,7 @@ export function generateMouthFrames(ipaText){
             case 'ɛ':
                 //console.log('h');
                 animaFrameArray.push(mouthEnum.ovalMouth);
+                correspondingIPALetters.push(currentIPAletter);
                 break;
 
             //if a 'ghost mouth' sound
@@ -74,8 +76,10 @@ export function generateMouthFrames(ipaText){
             case 'ɜ':
             case 'r':
             case 'ɹ':
+            case 'ɚ':
                 //console.log('e');
                 animaFrameArray.push(mouthEnum.ghostMouth);
+                correspondingIPALetters.push(currentIPAletter);
                 break;
 
             //if a 'tongue teeth mouth' sound
@@ -84,6 +88,7 @@ export function generateMouthFrames(ipaText){
             case 'θ':
                 //console.log('l');
                 animaFrameArray.push(mouthEnum.tongeTopTeethMouth);
+                correspondingIPALetters.push(currentIPAletter);
                 break;
 
             //if a 'circle mouth' sound
@@ -97,12 +102,14 @@ export function generateMouthFrames(ipaText){
             case 'o':
                 //console.log('eu'); 
                 animaFrameArray.push(mouthEnum.circleMouth);
+                correspondingIPALetters.push(currentIPAletter);
                 break;
 
             //if a 'bite lip mouth' sound
             case 'f':
             case 'v':
                 animaFrameArray.push(mouthEnum.biteLipMouth);
+                correspondingIPALetters.push(currentIPAletter);
                 break;
             
             //if a 'hmm mouth' sound
@@ -110,6 +117,7 @@ export function generateMouthFrames(ipaText){
             case 'm':
             case 'p':
                 animaFrameArray.push(mouthEnum.hmmMouth);
+                correspondingIPALetters.push(currentIPAletter);
                 break;
             
             //if a 'top teeth mouth' sound
@@ -120,12 +128,14 @@ export function generateMouthFrames(ipaText){
             case 'n':
             case 'ŋ':
                 animaFrameArray.push(mouthEnum.topTeethMouth);
+                correspondingIPALetters.push(currentIPAletter);
                 break;
 
             //if a 'teeth down mouth' sound
             case 'ʧ':
             case 't':
                 animaFrameArray.push(mouthEnum.teethDownMouth);
+                correspondingIPALetters.push(currentIPAletter);
                 break;
 
             //if a 'teeth up mouth' sound
@@ -136,6 +146,7 @@ export function generateMouthFrames(ipaText){
             case 'z':
             case 'ʒ':
                 animaFrameArray.push(mouthEnum.teethUpMouth);
+                correspondingIPALetters.push(currentIPAletter);
                 break;
             
             //if a 'wide mouth' sound
@@ -144,6 +155,7 @@ export function generateMouthFrames(ipaText){
             case 'ɪə':
             case 'ɑ':
                 animaFrameArray.push(mouthEnum.wideMouth);
+                correspondingIPALetters.push(currentIPAletter);
                 break;
 
             //if a 'blob' sound
@@ -153,6 +165,7 @@ export function generateMouthFrames(ipaText){
             case 'aɪ':
             case 'eə':
                 animaFrameArray.push(mouthEnum.blobMouth);
+                correspondingIPALetters.push(currentIPAletter);
                 break;
 
             default:
@@ -160,6 +173,8 @@ export function generateMouthFrames(ipaText){
                 break;
         }           
     }
-    //console.log(animaFrameArray);
-    return animaFrameArray;
+    return {
+        frames: animaFrameArray,
+        ipaLetters: correspondingIPALetters
+    };
 }
