@@ -28,6 +28,13 @@ const startImg = new Image();
 startImg.src = "mouths/closedMouth.png";
 
 startImg.onload = function() {
+    //gets device pixel ratio (DPI scaling factor)
+    //ensures proper scaling across screens
+    const dpi = window.devicePixelRatio || 1;
+
+
+    mouthCanvas.width = mouthCanvas.width / dpi;
+    mouthCanvas.height = mouthCanvas.height / dpi;
     setUpCanvas();
 }
 
@@ -112,9 +119,12 @@ if(mouthSizeInput){
         //if invalid num entered, default to 400
         let canvasSize = parseFloat(event.target.value) || 400;
 
+        //gets device pixel ratio (DPI scaling factor)
+        //ensures proper scaling across screens
+        const dpi = window.devicePixelRatio || 1;
 
-        mouthCanvas.width = canvasSize;
-        mouthCanvas.height = canvasSize;
+        mouthCanvas.width = canvasSize / dpi;
+        mouthCanvas.height = canvasSize / dpi;
         setUpCanvas()
     })
 } else {
@@ -685,15 +695,3 @@ function createFrameCarousel(){
 genFramesButton.addEventListener('click', () => {
     createFrameCarousel();
 });
-
-function adjustFontSize() {
-    let words = wordDisplay.innerText.split(" ").length;
-
-    // Base font size: reduce as word count increases
-    let fontSize = Math.max(40 - (words/2), 12); // Prevent going too small
-
-    wordDisplay.style.fontSize = fontSize + "px";
-}
-
-// Run on page load
-adjustFontSize();
