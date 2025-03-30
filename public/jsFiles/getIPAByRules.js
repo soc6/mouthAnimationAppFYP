@@ -7,7 +7,8 @@ export function getIPAByRules(word){
             case 'a':
                 ipaOutput += 'a';
                 break;
-            case 'b':
+            case 'b': 
+                //RULE [B] =/b/
                 ipaOutput += 'b';
                 break;
             case 'c':
@@ -67,6 +68,7 @@ export function getIPAByRules(word){
                 ipaOutput += 's';
                 break;
             case 't':
+                //RULE [T] = /t/
                 ipaOutput += 't';
                 break;
             case 'u':

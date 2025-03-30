@@ -16,7 +16,6 @@ const wordDisplay = document.getElementById('wordDisplay');
 let microphoneEnabled = false;
 let wantedVoiceName = 'Microsoft George - English (United Kingdom)';
 
-
 let timeForEachFrame = 55;
 let speechRate = 1;
 let backgroundColour = 'white';
@@ -92,7 +91,6 @@ function fetchDict() {
         .then(response => response.json())
         .then(data => {
             IPAConvertionDictionary = data;
-            //console.log(data);
         })
         .catch(error => console.log('Error fetching data: ', error));
 }
@@ -103,11 +101,8 @@ window.onload = fetchDict;
 if(backgroundColourList){
     backgroundColourList.addEventListener('change', (event) => {
         backgroundColour = event.target.value;
-        ctx.fillStyle = backgroundColour;
-
-        ctx.fillRect(0, 0, mouthCanvas.width, mouthCanvas.height);
-        ctx.drawImage(startImg, 0, 0, mouthCanvas.width, mouthCanvas.height);
-    })
+        setUpCanvas();
+    });
 } else {
     console.log("backgroundColourList doesn't exist");
 }
@@ -185,7 +180,6 @@ async function processInput(){
 
     let input = wordsInput.value;
    
-
     const utterThis = new SpeechSynthesisUtterance(input);
     utterThis.pitch = 0;
     utterThis.rate = speechRate;
@@ -195,14 +189,9 @@ async function processInput(){
     }
     console.log(utterThis.voice)
 
-    //synth.resume();
     utterThis.addEventListener("boundary", async (event) => {
-        //utterThis.rate = speechRate; //doesnt do anything, Maybe pausing then resuming will allow it to work?
         if(event.name == 'word'){
-            console.log('new word ');
             let startIndex = event.charIndex;
-
-            //console.log(input[startIndex]);
 
             let result = getWordFromIndex(input,startIndex);
             let curWord = result.word;
@@ -210,13 +199,11 @@ async function processInput(){
 
             updateWordDisplay(input,startIndex,result.end);
 
-            //we also want to update Gif
             await lipSyncWord(curWord);
         }
     });
 
     utterThis.addEventListener("end", (event) => {
-        //document.getElementById('wordDisplay').innerHTML = input.replace(/(\r\n|\n)/g, '<br>');
         updateClickableWordDisplay(input);
         micButton.disabled = false;
         downloadVideoButton.disabled = false;
@@ -241,7 +228,6 @@ function updateClickableWordDisplay(fullText){
 
     //break text into seperate lines
     let lines = fullText.split(/\r?\n/);
-    //console.log(lines)
 
     let newWordDisplay = ""
     //for each line
@@ -250,16 +236,11 @@ function updateClickableWordDisplay(fullText){
         //break the current line into words
         let words = lines[j].split(' ');
 
-        //console.log(words)
-
         //for each word, add it to 'newWordDisplay' with a unique ID span
-        
         for (let i = 0; i < words.length; i++) {
             newWordDisplay += `<span id="span${j}-${i}">${words[i]}</span> `;
         }
         newWordDisplay += '<br>';
-
-        //console.log(newWordDisplay)
     }
 
     //add the new text to the html
@@ -314,7 +295,6 @@ async function lipSyncWord(input){
     input = input.trim();
     input = input.replace(/[.,\/#!$?%\^\*;":{}=\_`~()]/g,"");
     input = input.replace(/[\r\n]+/g, ''); 
-    //console.log('The inputted word is "'+input+'"');
 
     let output = IPAConvertionDictionary[input];
 
@@ -324,7 +304,6 @@ async function lipSyncWord(input){
     let byRules = "";
     if(output == undefined){
         output = getIPAByRules(input);
-        //console.log(output)
         byRules += ", found using rules"
     }
 
@@ -449,7 +428,7 @@ function populateVoiceList() {
     //if no microsoft voices were found, warn the user
     console.log(wantedVoiceName)
     if(microSoftvoiceFound == false){
-        alert("Warning: This app needs Microsoft Text-To-Speech voices to work\nIt seems like your browser doesn't support these voices\nPlease trying using a different browser (like microsoft edge or google chrome) to get the most out of this app")
+        alert("There was an error loading the Microsoft Text-To-Speech voices\n\nPlease try refreshing the page to try and reload the voices\n\nIf this error persists, your browser might not support the Microsoft Text-To-Speech voices.\nTry using a different browser that supports Microsoft Text-To-Speech voices (like Microsoft Edge or Google Chrome) to get the most out of this app.")
         console.log('no microsoft found')
     }
 }
@@ -472,7 +451,6 @@ function stopSpeaking() {
     if(synth.speaking){
         synth.cancel();
         recorder.stop();
-        //document.getElementById('wordDisplay').innerHTML = wordsInput.value.replace(/(\r\n|\n)/g, '<br>');
         updateClickableWordDisplay(wordsInput.value);
         micButton.disabled = false;
     }
@@ -570,9 +548,9 @@ const mouths = [
 
 function createFrameCarousel(){
     var input = mouthFrameInput.value;
-    console.log(input)
 
     //process the word so it can be used as a key for the dictionary
+    input = input.split(' ')[0]
     input = input.toLowerCase();
     input = input.trim();
     input = input.replace(/[.,\/#!$?%\^\*;":{}=\_`~()]/g,"");
@@ -585,19 +563,12 @@ function createFrameCarousel(){
     if(output == undefined){
         output = getIPAByRules(input);
     }
-    console.log(output)
     mouthFrameHeading.innerText = "'"+input+"'"+" has the IPA spelling '"+output+"'";
 
     //Make a carousel using the IPA frames
     let mouthFramesReturn = generateMouthFrames(output);
     let carouselFrames = mouthFramesReturn.frames;
     let ipaLetterCaptions = mouthFramesReturn.ipaLetters;
-
-    console.log(carouselFrames)
-
-    for(let c=0; c < carouselFrames.length; c++){
-        console.log(mouths[carouselFrames[c]]);
-    }
 
     //make main carousel div
     const carousel = document.createElement("div");
@@ -639,7 +610,6 @@ function createFrameCarousel(){
         //create a frame image
         const frameImage = document.createElement("div");
         frameImage.className = "carousel-item";
-        
 
         //create image to be shown for frame
         const img = document.createElement("img");
@@ -716,10 +686,7 @@ genFramesButton.addEventListener('click', () => {
     createFrameCarousel();
 });
 
-
-
 function adjustFontSize() {
-    console.log('WOOOWWWW')
     let words = wordDisplay.innerText.split(" ").length;
 
     // Base font size: reduce as word count increases
@@ -727,9 +694,6 @@ function adjustFontSize() {
 
     wordDisplay.style.fontSize = fontSize + "px";
 }
-
-// Adjust when content changes
-//wordDisplay.addEventListener("input", adjustFontSize);
 
 // Run on page load
 adjustFontSize();

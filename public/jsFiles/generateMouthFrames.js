@@ -58,14 +58,12 @@ export function generateMouthFrames(ipaText){
         else {
             currentIPAletter = ipaText.charAt(i);
         }
-        //console.log(currentIPAletter);
         switch(currentIPAletter) {
             //if a 'oval mouth' sound
             case 'h':
             case 'e':
             case 'ɪ':
             case 'ɛ':
-                //console.log('h');
                 animaFrameArray.push(mouthEnum.ovalMouth);
                 correspondingIPALetters.push(currentIPAletter);
                 break;
@@ -77,7 +75,6 @@ export function generateMouthFrames(ipaText){
             case 'r':
             case 'ɹ':
             case 'ɚ':
-                //console.log('e');
                 animaFrameArray.push(mouthEnum.ghostMouth);
                 correspondingIPALetters.push(currentIPAletter);
                 break;
@@ -86,7 +83,6 @@ export function generateMouthFrames(ipaText){
             case 'l':
             case 'ð':
             case 'θ':
-                //console.log('l');
                 animaFrameArray.push(mouthEnum.tongeTopTeethMouth);
                 correspondingIPALetters.push(currentIPAletter);
                 break;
@@ -100,7 +96,6 @@ export function generateMouthFrames(ipaText){
             case 'ɔɪ':
             case 'ɔ':
             case 'o':
-                //console.log('eu'); 
                 animaFrameArray.push(mouthEnum.circleMouth);
                 correspondingIPALetters.push(currentIPAletter);
                 break;

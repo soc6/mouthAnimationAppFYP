@@ -14,7 +14,6 @@ export function getWordFromIndex(str, index) {
     }
   
     // Slice the string to get the word
-    //console.log('The word "'+str.slice(start, end)+'" starts at '+start+' and ends at '+end);
     let word = str.slice(start, end);
 
     return { word , end };

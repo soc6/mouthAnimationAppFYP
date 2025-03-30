@@ -1,112 +1,224 @@
 import { describe, it, expect } from "vitest";
-import { generateMouthFrames } from '../public/jsFiles/generateMouthFrames.js'
+import { generateMouthFrames } from '../public/jsFiles/generateMouthFrames.js';
+import { getWordFromIndex } from '../public/jsFiles/helperFunctions.js';
+import { getIPAByRules } from "../public/jsFiles/getIPAByRules.js";
 
 describe('generateMouthFrames', () => {
     it('Testing that hello returns the expected frame numbers', () => {
-        const expectedArray = [1, 11, 3, 4];
+        const expectedFrameArray = [1, 11, 3, 4, 4];
+        const expectedIPALetterArray = ['h','ʌ','l','o','w'];
         const IPAHello = 'hʌlowˈ';
 
-        let receivedArray = generateMouthFrames(IPAHello);
+        let received = generateMouthFrames(IPAHello);
 
-        expect(receivedArray).toStrictEqual(expectedArray);
+        expect(received.frames).toStrictEqual(expectedFrameArray);
+        expect(received.ipaLetters).toStrictEqual(expectedIPALetterArray);
     });
 
     it('Testing all the letters that should return the "Oval mouth" frame number', () => {
-        const expectedArray = [1, 1, 1, 1];
+        const expectedFrameArray = [1, 1, 1, 1];
+        const expectedIPALetterArray = ['h','ɪ','e','ɛ'];
         const ovalMouthLetters = 'hɪeɛ';
 
-        let receivedArray = generateMouthFrames(ovalMouthLetters);
+        let received = generateMouthFrames(ovalMouthLetters);
 
-        expect(receivedArray).toStrictEqual(expectedArray);
+        expect(received.frames).toStrictEqual(expectedFrameArray);
+        expect(received.ipaLetters).toStrictEqual(expectedIPALetterArray);
     });
 
     it('Testing all the letters that should return the "Oval mouth" frame number', () => {
-        const expectedArray = [2, 2, 2, 2];
+        const expectedFrameArray = [2, 2, 2, 2];
+        const expectedIPALetterArray = ['ə','ɜ','r','ʊ'];
         const ghostMouthLetters = 'əɜrʊ';
 
-        let receivedArray = generateMouthFrames(ghostMouthLetters);
+        let received = generateMouthFrames(ghostMouthLetters);
 
-        expect(receivedArray).toStrictEqual(expectedArray);
+        expect(received.frames).toStrictEqual(expectedFrameArray);
+        expect(received.ipaLetters).toStrictEqual(expectedIPALetterArray);
     });
 
     it('Testing all the letters that should return the "tongue teeth mouth" frame number', () => {
-        const expectedArray = [3, 3, 3];
+        const expectedFrameArray = [3, 3, 3];
+        const expectedIPALetterArray = ['ð','l','θ'];
         const tongueTeethMouthLetters = 'ðlθ';
 
-        let receivedArray = generateMouthFrames(tongueTeethMouthLetters);
+        let received = generateMouthFrames(tongueTeethMouthLetters);
 
-        expect(receivedArray).toStrictEqual(expectedArray);
+        expect(received.frames).toStrictEqual(expectedFrameArray);
+        expect(received.ipaLetters).toStrictEqual(expectedIPALetterArray);
     });
 
     it('Testing all the letters that should return the "circle mouth" frame number', () => {
-        const expectedArray = [4, 4, 4, 4, 4, 4];
+        const expectedFrameArray = [4, 4, 4, 4, 4, 4];
+        const expectedIPALetterArray = ['əʊ','u','w','oʊ','aʊ','ɔɪ'];
         const circleMouthLetters = 'əʊuwoʊaʊɔɪ';
 
-        let receivedArray = generateMouthFrames(circleMouthLetters);
+        let received = generateMouthFrames(circleMouthLetters);
 
-        expect(receivedArray).toStrictEqual(expectedArray);
+        expect(received.frames).toStrictEqual(expectedFrameArray);
+        expect(received.ipaLetters).toStrictEqual(expectedIPALetterArray);
     });
 
     it('Testing all the letters that should return the "bite lip mouth" frame number', () => {
-        const expectedArray = [5, 5];
+        const expectedFrameArray = [5, 5];
+        const expectedIPALetterArray = ['f','v'];
         const lipBiteMouthLetters = 'fv';
 
-        let receivedArray = generateMouthFrames(lipBiteMouthLetters);
+        let received = generateMouthFrames(lipBiteMouthLetters);
 
-        expect(receivedArray).toStrictEqual(expectedArray);
+        expect(received.frames).toStrictEqual(expectedFrameArray);
+        expect(received.ipaLetters).toStrictEqual(expectedIPALetterArray);
     });
 
     it('Testing all the letters that should return the "hmm mouth" frame number', () => {
-        const expectedArray = [6, 6, 6];
+        const expectedFrameArray = [6, 6, 6];
+        const expectedIPALetterArray = ['b','p','m'];
         const hmmMouthLetters = 'bpm';
 
-        let receivedArray = generateMouthFrames(hmmMouthLetters);
+        let received = generateMouthFrames(hmmMouthLetters);
 
-        expect(receivedArray).toStrictEqual(expectedArray);
+        expect(received.frames).toStrictEqual(expectedFrameArray);
+        expect(received.ipaLetters).toStrictEqual(expectedIPALetterArray);
     });
 
     it('Testing all the letters that should return the "top teeth mouth" frame number', () => {
-        const expectedArray = [7, 7, 7, 7, 7, 7];
+        const expectedFrameArray = [7, 7, 7, 7, 7, 7];
+        const expectedIPALetterArray = ['d','g','ʤ','k','n','ŋ'];
         const topTeethMouthLetters = 'dgʤknŋ';
 
-        let receivedArray = generateMouthFrames(topTeethMouthLetters);
+        let received = generateMouthFrames(topTeethMouthLetters);
 
-        expect(receivedArray).toStrictEqual(expectedArray);
+        expect(received.frames).toStrictEqual(expectedFrameArray);
+        expect(received.ipaLetters).toStrictEqual(expectedIPALetterArray);
     });
 
     it('Testing all the letters that should return the "teeth down mouth" frame number', () => {
-        const expectedArray = [8, 8];
+        const expectedFrameArray = [8, 8];
+        const expectedIPALetterArray = ['t','ʧ'];
         const teethdownMouthLetters = 'tʧ';
 
-        let receivedArray = generateMouthFrames(teethdownMouthLetters);
+        let received = generateMouthFrames(teethdownMouthLetters);
 
-        expect(receivedArray).toStrictEqual(expectedArray);
+        expect(received.frames).toStrictEqual(expectedFrameArray);
+        expect(received.ipaLetters).toStrictEqual(expectedIPALetterArray);
     });
 
     it('Testing all the letters that should return the "teeth up mouth" frame number', () => {
-        const expectedArray = [9, 9, 9, 9, 9, 9];
+        const expectedFrameArray = [9, 9, 9, 9, 9, 9];
+        const expectedIPALetterArray = ['i','j','s','ʃ','z','ʒ'];
         const teethdownMouthLetters = 'ijsʃzʒ';
 
-        let receivedArray = generateMouthFrames(teethdownMouthLetters);
+        let received = generateMouthFrames(teethdownMouthLetters);
 
-        expect(receivedArray).toStrictEqual(expectedArray);
+        expect(received.frames).toStrictEqual(expectedFrameArray);
+        expect(received.ipaLetters).toStrictEqual(expectedIPALetterArray);
     });
 
     it('Testing all the letters that should return the "wide mouth" frame number', () => {
-        const expectedArray = [10, 10, 10];
+        const expectedFrameArray = [10, 10, 10];
+        const expectedIPALetterArray = ['æ','eɪ','ɪə'];
         const wideMouthLetters = 'æeɪɪə';
 
-        let receivedArray = generateMouthFrames(wideMouthLetters);
+        let received = generateMouthFrames(wideMouthLetters);
 
-        expect(receivedArray).toStrictEqual(expectedArray);
+        expect(received.frames).toStrictEqual(expectedFrameArray);
+        expect(received.ipaLetters).toStrictEqual(expectedIPALetterArray);
     });
 
     it('Testing all the letters that should return the "blob mouth" frame number', () => {
-        const expectedArray = [11, 11, 11, 11, 11];
+        const expectedFrameArray = [11, 11, 11, 11, 11];
+        const expectedIPALetterArray = ['a','ɒ','ʌ','aɪ','eə'];
         const blobMouthLetters = 'aɒʌaɪeə';
 
-        let receivedArray = generateMouthFrames(blobMouthLetters);
+        let received = generateMouthFrames(blobMouthLetters);
 
-        expect(receivedArray).toStrictEqual(expectedArray);
+        expect(received.frames).toStrictEqual(expectedFrameArray);
+        expect(received.ipaLetters).toStrictEqual(expectedIPALetterArray);
     });
-})
+});
+
+describe('getWordFromIndex', () => {
+    it('Testing that getWordFromIndex can get a word in the middle of a string', () => {
+        const exampleStringMiddle = "Hello this is a test string";
+        const expectedWord1 = "test";
+        const expectedWord2 = "is"
+
+        const expectedWord1Index = 16;
+        const expectedWord2Index = 11;
+
+        const expectedWord1EndIndex = 20;
+        const expectedWord2EndIndex = 13;
+
+        let word1 = getWordFromIndex(exampleStringMiddle, expectedWord1Index);
+        let word2 = getWordFromIndex(exampleStringMiddle, expectedWord2Index);
+
+        expect(word1.word).toStrictEqual(expectedWord1);
+        expect(word2.word).toStrictEqual(expectedWord2);
+
+        expect(word1.end).toStrictEqual(expectedWord1EndIndex);
+        expect(word2.end).toStrictEqual(expectedWord2EndIndex);
+    });
+
+    it('Testing that getWordFromIndex can get a word at the end of a string', () => {
+        const exampleStringEnd = "This is another test string where we need the last word";
+        const expectedWordEnd = "word";
+
+        const expectedWordIndexEnd = 51;
+
+        const expectedWordEndIndexEnd = 55;
+
+        let word = getWordFromIndex(exampleStringEnd, expectedWordIndexEnd);
+
+        expect(word.word).toStrictEqual(expectedWordEnd);
+
+        expect(word.end).toStrictEqual(expectedWordEndIndexEnd);
+    });
+
+    it('Testing that getWordFromIndex can get a word at the start of a string', () => {
+        const exampleStringStart = "This string will get the word at the start";
+        const expectedWordStart = "This";
+
+        const expectedWordIndexStart = 0;
+
+        const expectedWordEndIndex = 4;
+
+        let word = getWordFromIndex(exampleStringStart, expectedWordIndexStart);
+
+        expect(word.word).toStrictEqual(expectedWordStart);
+
+        expect(word.end).toStrictEqual(expectedWordEndIndex);
+    });
+});
+
+describe('getIPAByRules', () => {
+    it('Testing that getIPAByRules can get the IPA for the word "Youtube"', () => {
+        const inputWord = 'youtube';
+        const expectedIPA = 'jutub';
+
+        let wordIPARepresentation = getIPAByRules(inputWord);
+
+        expect(wordIPARepresentation).toStrictEqual(expectedIPA);
+    });
+
+    it('Testing the default rules returned by getIPAByRules ', () => {
+        const alphabet = 'abcdefghijklmnopqrstuvwxyz';
+        const expectedDefaultRules = 'abkdfghɪjklmŋoʊpqɹstuvwksjz';
+
+        let alphabetIPARepresentation = getIPAByRules(alphabet);
+
+        expect(alphabetIPARepresentation).toStrictEqual(expectedDefaultRules);
+
+        //testing u and e seperatly because they don't use the default when followed by 't' and 'd' respectively
+        const e = 'e';
+        const u = 'u';
+
+        const defaultERule = 'e';
+        const defaultURule = 'ə';
+
+        let eIPA = getIPAByRules(e);
+        let uIPA = getIPAByRules(u);
+
+        expect(eIPA).toStrictEqual(defaultERule);
+        expect(uIPA).toStrictEqual(defaultURule);
+    });
+});
