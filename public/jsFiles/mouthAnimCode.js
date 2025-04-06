@@ -20,8 +20,6 @@ let timeForEachFrame = 55;
 let speechRate = 1;
 let backgroundColour = 'white';
 
-
-//TRYING OUT SOME CANVAS PLSS WORRRRK BABY
 const mouthCanvas = document.getElementById("mouthCanvas");
 const ctx = mouthCanvas.getContext("2d");
 const startImg = new Image();
@@ -31,7 +29,6 @@ startImg.onload = function() {
     //gets device pixel ratio (DPI scaling factor)
     //ensures proper scaling across screens
     const dpi = window.devicePixelRatio || 1;
-
 
     mouthCanvas.width = mouthCanvas.width / dpi;
     mouthCanvas.height = mouthCanvas.height / dpi;
